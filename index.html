@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Magic Item Creator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .rules {
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 600px;
+        }
+        .button-container {
+            margin: 20px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            max-width: 600px;
+            display: none;
+        }
+    </style>
+    <script>
+        const magicItems = [
+            { name: "Blade of Shadows", rarity: "Rare", attunement: "Yes", effect: "A dagger that deals an additional 2d6 necrotic damage and grants advantage on Stealth checks in dim light or darkness." },
+            { name: "Spellweaver's Orb", rarity: "Rare", attunement: "Yes", effect: "A crystal orb that allows the Sorcerer to reroll one spell damage die per short rest." },
+            { name: "Thief's Whisper", rarity: "Uncommon", attunement: "Yes", effect: "A cloak that grants advantage on Sleight of Hand checks and Dexterity saving throws." },
+            { name: "Shield of the Valiant", rarity: "Rare", attunement: "Yes", effect: "A shield that adds +1 to AC and grants the ability to cast Shield once per day." },
+            { name: "Oathbreaker’s Grasp", rarity: "Very Rare", attunement: "Yes", effect: "A gauntlet that adds +1 to attack rolls and deals an additional 1d8 necrotic damage on critical hits." },
+            { name: "Soulfire Blade", rarity: "Rare", attunement: "Yes", effect: "A longsword that deals an additional 1d6 radiant or necrotic damage (user’s choice)." },
+            { name: "Band of Precision", rarity: "Uncommon", attunement: "Yes", effect: "A ring that grants +2 to ranged attack rolls." },
+            { name: "Warden’s Vigil", rarity: "Rare", attunement: "Yes", effect: "A magical helm that grants darkvision and immunity to being frightened." },
+            { name: "Gem of Elemental Might", rarity: "Rare", attunement: "Yes", effect: "A gem that allows the caster to add an extra 1d8 damage of fire, cold, or lightning (chosen at attunement) to a spell once per short rest." },
+            { name: "Cloak of the Void", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants resistance to necrotic damage and the ability to teleport 30 feet as a bonus action once per short rest." },
+            { name: "Ethereal Chain", rarity: "Rare", attunement: "Yes", effect: "A chainmail that allows the wearer to cast Blink once per day." },
+            { name: "Phoenix Feather Quill", rarity: "Uncommon", attunement: "No", effect: "A magical quill that never runs out of ink and can transcribe spoken words perfectly." },
+            { name: "Ring of Frozen Resolve", rarity: "Rare", attunement: "Yes", effect: "Grants resistance to cold damage and allows the user to cast Ice Knife once per day." },
+            { name: "Boots of the Bounding Hare", rarity: "Uncommon", attunement: "No", effect: "Increases jump distance by threefold." },
+            { name: "Gauntlets of Fiery Retribution", rarity: "Rare", attunement: "Yes", effect: "Deals 1d6 fire damage to attackers when hit by a melee attack." },
+            { name: "Helm of Arcane Sight", rarity: "Rare", attunement: "Yes", effect: "Allows the wearer to see magical auras as if using Detect Magic." },
+            { name: "Bracers of the Swift Blade", rarity: "Rare", attunement: "Yes", effect: "Grants an additional melee attack as a bonus action once per short rest." },
+            { name: "Quiver of Endless Bolts", rarity: "Uncommon", attunement: "No", effect: "Generates non-magical crossbow bolts endlessly." },
+            { name: "Amulet of the Lunar Cycle", rarity: "Very Rare", attunement: "Yes", effect: "Grants the wearer advantage on Wisdom saving throws during the night." },
+            { name: "Mantle of the Stormcaller", rarity: "Very Rare", attunement: "Yes", effect: "Allows the wearer to cast Call Lightning once per long rest." },
+            { name: "Gloves of Alchemical Mastery", rarity: "Rare", attunement: "Yes", effect: "Grants advantage on crafting potions and doubles the duration of potions consumed." },
+            { name: "Sword of the Dancing Flame", rarity: "Rare", attunement: "Yes", effect: "A sword wreathed in magical fire that deals an additional 1d8 fire damage on hit." },
+            { name: "Bow of the Silent Hunt", rarity: "Rare", attunement: "Yes", effect: "A bow that grants +1 to attack rolls and makes no sound when firing." },
+            { name: "Staff of Echoing Spells", rarity: "Very Rare", attunement: "Yes", effect: "Allows the user to cast one spell they just cast again without expending a spell slot, once per long rest." },
+            { name: "Boots of Shadow Step", rarity: "Rare", attunement: "Yes", effect: "Grants the ability to teleport 20 feet to an unoccupied space within dim light or darkness." },
+            { name: "Armor of the Frostbound", rarity: "Very Rare", attunement: "Yes", effect: "Grants resistance to cold damage and deals 1d4 cold damage to attackers when hit." },
+            { name: "Crown of the Stars", rarity: "Very Rare", attunement: "Yes", effect: "Grants the wearer the ability to cast Guiding Bolt three times per long rest." },
+            { name: "Ring of Arcane Recovery", rarity: "Rare", attunement: "Yes", effect: "Allows the user to recover one spell slot of up to 3rd level once per day." },
+            { name: "Dagger of Venomfang", rarity: "Rare", attunement: "Yes", effect: "Deals an additional 2d6 poison damage on a critical hit." },
+            { name: "Blade of Radiant Truth", rarity: "Very Rare", attunement: "Yes", effect: "A longsword that deals an additional 2d8 radiant damage and emits bright light in a 20-foot radius. Can cast Zone of Truth once per long rest." },
+            { name: "Thief’s Agile Gloves", rarity: "Rare", attunement: "Yes", effect: "Grants advantage on Dexterity (Acrobatics) and (Sleight of Hand) checks. Adds +2 to initiative rolls." },
+            { name: "Cloak of Ebon Wings", rarity: "Very Rare", attunement: "Yes", effect: "Allows the wearer to fly at 60 feet for 10 minutes, once per long rest. Grants resistance to necrotic damage." },
+            { name: "Spear of the Tempest", rarity: "Rare", attunement: "Yes", effect: "A magical spear that deals an additional 1d6 lightning damage. Can cast Thunderwave once per short rest." },
+            { name: "Band of Shadowstep", rarity: "Rare", attunement: "Yes", effect: "Allows the wearer to teleport up to 30 feet as a bonus action to a space they can see." },
+            { name: "Fighter’s Iron Resolve Pendant", rarity: "Rare", attunement: "Yes", effect: "Grants the wearer temporary hit points equal to their level when they drop below half their HP once per long rest." },
+            { name: "Bracers of Deflection", rarity: "Rare", attunement: "Yes", effect: "Grants +2 to AC against ranged attacks and allows the wearer to deflect a single projectile per short rest." },
+            { name: "Paladin’s Eternal Flame", rarity: "Very Rare", attunement: "Yes", effect: "A holy symbol that adds +1 to spell attack rolls and damage. Allows casting Aura of Life once per long rest." },
+            { name: "Sorcerer’s Flux Stone", rarity: "Rare", attunement: "Yes", effect: "Allows the Sorcerer to regain 2 Sorcery Points once per short rest." },
+            { name: "Vial of Fiendfire", rarity: "Uncommon", attunement: "No", effect: "A throwable vial that explodes in a 10-foot radius dealing 3d6 fire damage and 1d6 necrotic damage." },
+            { name: "Lunar Blade", rarity: "Very Rare", attunement: "Yes", effect: "A sword that glows with moonlight. Deals an additional 2d6 radiant damage on a hit during the night and grants the ability to cast Moonbeam once per day." },
+            { name: "Flamecaller Gauntlets", rarity: "Uncommon", attunement: "Yes", effect: "These gauntlets allow the wearer to cast Fire Bolt at will and gain resistance to fire damage." },
+            { name: "Aegis of the Tidal Guard", rarity: "Rare", attunement: "Yes", effect: "A shield that grants resistance to cold damage and the ability to cast Control Water once per long rest." },
+            { name: "Veil of the Phantom", rarity: "Legendary", attunement: "Yes", effect: "This cloak allows the wearer to become invisible for 1 minute once per day. While invisible, the wearer can move through walls and obstacles as if they were ethereal." },
+            { name: "Ring of the Stormborn", rarity: "Rare", attunement: "Yes", effect: "This ring grants the wearer the ability to cast Call Lightning once per day and grants resistance to lightning damage." },
+            { name: "Staff of Eternal Twilight", rarity: "Very Rare", attunement: "Yes", effect: "A staff that grants the ability to cast Twilight Sanctuary once per long rest. The staff also increases the user's spellcasting ability modifier by +2." },
+            { name: "Cloak of the Forest’s Embrace", rarity: "Uncommon", attunement: "Yes", effect: "A cloak that allows the wearer to blend into natural environments, granting advantage on Stealth checks in forests, swamps, and jungles." },
+            { name: "Vortex Blade", rarity: "Rare", attunement: "Yes", effect: "A weapon that deals an additional 1d8 force damage. Once per day, the wielder can cast a gust of wind or create a small vortex that pulls enemies within 15 feet toward the blade." },
+            { name: "Wand of Celestial Light", rarity: "Rare", attunement: "Yes", effect: "A wand that grants the wielder the ability to cast the Light cantrip and once per long rest, can cast Sunbeam." },
+            { name: "Amulet of the Arcane Sentinel", rarity: "Very Rare", attunement: "Yes", effect: "This amulet increases the wearer’s AC by +2 and grants advantage on saving throws against spells." },
+  { name: "Crown of the Unyielding Mind", rarity: "Legendary", attunement: "Yes", effect: "This crown grants the wearer immunity to psychic damage and the ability to cast Mind Blank once per day." },
+  { name: "Boots of the Wyrmstep", rarity: "Rare", attunement: "Yes", effect: "These boots allow the wearer to walk on difficult terrain with ease, ignore the effects of the fly spell, and grant resistance to poison damage." },
+  { name: "Chalice of Pure Waters", rarity: "Uncommon", attunement: "No", effect: "A small chalice that, when filled with water, creates a healing potion. Can create up to three potions per week." },
+  { name: "The Ironroot Shield", rarity: "Rare", attunement: "Yes", effect: "A shield that grants the wearer resistance to bludgeoning damage and the ability to plant it into the ground to create a 10-foot radius of difficult terrain around them for 1 minute once per long rest." },
+  { name: "Moonshadow Dagger", rarity: "Rare", attunement: "Yes", effect: "This dagger grants the ability to cast Shadow Blade once per day and deals an additional 1d6 necrotic damage on a hit during the night." },
+  { name: "Eye of the Druid King", rarity: "Legendary", attunement: "Yes", effect: "This gemstone allows the wearer to communicate with and control beasts and plants. Grants the ability to cast Conjure Animals once per long rest." },
+  { name: "Gloves of Precision", rarity: "Uncommon", attunement: "Yes", effect: "These gloves grant the wearer advantage on Sleight of Hand checks and allow them to cast Mage Hand at will." },
+  { name: "Sword of Storms", rarity: "Very Rare", attunement: "Yes", effect: "A longsword that deals an additional 1d8 lightning damage on a hit and allows the wielder to cast Chain Lightning once per day." },
+  { name: "Helm of the Dragon’s Fury", rarity: "Legendary", attunement: "Yes", effect: "This helm grants the wearer resistance to fire damage and allows them to cast Fireball once per long rest, dealing additional fire damage based on the wearer’s Constitution modifier." },
+  { name: "Tome of Arcane Secrets", rarity: "Very Rare", attunement: "No", effect: "This ancient tome contains spells lost to time. When studying it for 1 hour, a spellcaster can learn one new spell of any level (up to 5th level) that they are capable of casting, once per week." },
+  { name: "Scales of the Earthshaker", rarity: "Rare", attunement: "Yes", effect: "A set of scales that grant the wearer resistance to bludgeoning damage and the ability to cast Earthquake once per long rest." },
+{ name: "Cloak of the Phoenix", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants the wearer the ability to cast Fireball once per day and resurrects the wearer once per long rest if they die, with no material cost." },
+{ name: "Heartstone Ring", rarity: "Uncommon", attunement: "Yes", effect: "A ring that allows the wearer to cast Cure Wounds once per day and grants resistance to necrotic damage." },
+{ name: "Grim Reaper’s Scythe", rarity: "Legendary", attunement: "Yes", effect: "A scythe that deals an additional 2d6 necrotic damage on a hit and once per day can cast Finger of Death." },
+{ name: "Whispers of the Forgotten", rarity: "Rare", attunement: "Yes", effect: "A necklace that grants the wearer the ability to cast Detect Thoughts once per day and grants resistance to psychic damage." },
+{ name: "Mantle of the Immovable", rarity: "Very Rare", attunement: "Yes", effect: "A mantle that grants advantage on Strength and Constitution saving throws, and the wearer cannot be moved or knocked prone by magical or physical effects." },
+{ name: "Sword of the Abyss", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 2d6 force damage and once per long rest, allows the wielder to cast Plane Shift." },
+{ name: "Gloves of the Tempest", rarity: "Rare", attunement: "Yes", effect: "Gloves that allow the wearer to cast Thunderwave at will and gain resistance to thunder damage." },
+{ name: "Ring of the Gilded Mind", rarity: "Uncommon", attunement: "Yes", effect: "This ring grants the wearer the ability to cast Identify once per day and increases Intelligence by +2." },
+{ name: "Boots of the Eternal Hunt", rarity: "Rare", attunement: "Yes", effect: "These boots grant the wearer advantage on tracking creatures and allow them to cast Hunter's Mark once per long rest." },
+{ name: "Crown of the Sun King", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants the wearer the ability to cast Sunburst once per long rest and grants immunity to radiant damage." },
+{ name: "Amulet of Shadow’s Embrace", rarity: "Rare", attunement: "Yes", effect: "This amulet grants the wearer the ability to cast Darkness at will and resistance to necrotic damage." },
+{ name: "Vampiric Fang Dagger", rarity: "Very Rare", attunement: "Yes", effect: "A dagger that deals 1d6 necrotic damage and heals the wielder for the same amount on a successful hit." },
+{ name: "Wand of the Arcane Tempest", rarity: "Rare", attunement: "Yes", effect: "A wand that allows the wielder to cast Meteor Swarm once per day and grants resistance to fire and force damage." },
+{ name: "Shield of the Lionheart", rarity: "Legendary", attunement: "Yes", effect: "A shield that grants the wearer immunity to fear and the ability to cast Aura of Courage once per day." },
+{ name: "Dawnfire Bow", rarity: "Very Rare", attunement: "Yes", effect: "A bow that grants the ability to deal an additional 1d6 radiant damage on a hit and once per day can cast Flame Strike." },
+{ name: "Cloak of the Tides", rarity: "Rare", attunement: "Yes", effect: "This cloak grants the wearer the ability to cast Water Walk and Control Water once per day." },
+{ name: "Belt of Giants", rarity: "Legendary", attunement: "Yes", effect: "A belt that increases Strength by +4, grants advantage on Strength-based checks, and the wearer can cast Enlarge/Reduce at will." },
+{ name: "Glimmering Blade", rarity: "Uncommon", attunement: "No", effect: "A longsword that sheds bright light in a 10-foot radius. It deals an additional 1d6 radiant damage against undead." },
+{ name: "Ring of Temporal Sight", rarity: "Very Rare", attunement: "Yes", effect: "This ring allows the wearer to cast Time Stop once per week and grants the ability to see into the future, giving advantage on initiative rolls." },
+{ name: "Mirror of the Abyss", rarity: "Legendary", attunement: "No", effect: "A mirror that once per day can reflect an incoming spell back to its caster. The spell must be of 5th level or lower." },
+{ name: "Blade of the Eternal Hunt", rarity: "Legendary", attunement: "Yes", effect: "A longsword that deals an additional 1d8 piercing damage to beasts and allows the wielder to cast Hunter’s Mark once per day." },
+{ name: "Cloak of the Archmage", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants advantage on saving throws against spells and allows the wearer to cast Counterspell once per day." },
+{ name: "Ring of the Dragon’s Breath", rarity: "Rare", attunement: "Yes", effect: "This ring grants the ability to cast Dragon's Breath once per day, allowing the wearer to breathe fire, acid, lightning, or cold." },
+{ name: "Elven Bow of the Winds", rarity: "Rare", attunement: "Yes", effect: "A longbow that deals an additional 1d6 force damage on a hit and allows the wielder to cast Fly once per day." },
+{ name: "Crown of the Deep", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants the wearer the ability to breathe underwater, control water, and summon water elementals once per day." },
+{ name: "Gauntlets of the War Titan", rarity: "Very Rare", attunement: "Yes", effect: "These gauntlets increase Strength by +2 and allow the wearer to cast Earthquake once per long rest." },
+{ name: "Scimitar of the Sun King", rarity: "Rare", attunement: "Yes", effect: "A scimitar that deals an additional 1d6 radiant damage and once per day can cast Sunbeam." },
+{ name: "Orb of Arcane Power", rarity: "Very Rare", attunement: "Yes", effect: "An orb that grants the ability to cast Mage Armor at will and increases spellcasting ability by +2." },
+{ name: "Boots of Shadowstep", rarity: "Rare", attunement: "Yes", effect: "These boots allow the wearer to cast Misty Step once per day and grant advantage on Stealth checks." },
+{ name: "Amulet of the Firelord", rarity: "Legendary", attunement: "Yes", effect: "This amulet grants resistance to fire damage and allows the wearer to cast Fireball and Flame Strike once per day." },
+{ name: "Staff of the Wilds", rarity: "Very Rare", attunement: "Yes", effect: "A staff that grants the ability to cast Entangle and Barkskin at will and once per day can cast Conjure Animals." },
+{ name: "Tunic of the Beast King", rarity: "Rare", attunement: "Yes", effect: "A tunic that grants the wearer advantage on animal handling checks and allows them to cast Beast Sense once per day." },
+{ name: "Cloak of Eternal Winter", rarity: "Very Rare", attunement: "Yes", effect: "This cloak grants the wearer resistance to cold damage and the ability to cast Ice Storm once per day." },
+{ name: "Vampire’s Fang", rarity: "Legendary", attunement: "Yes", effect: "A dagger that deals an additional 1d6 necrotic damage and grants the wielder the ability to drain life force, healing for half the damage dealt." },
+{ name: "Hammer of the Ancients", rarity: "Legendary", attunement: "Yes", effect: "A massive warhammer that deals an additional 2d6 bludgeoning damage and once per day can create a shockwave, stunning enemies within 30 feet." },
+{ name: "Boots of the Underdark", rarity: "Rare", attunement: "Yes", effect: "These boots allow the wearer to move through difficult terrain in caves and underground environments, and grant resistance to poison damage." },
+{ name: "Ring of Teleportation", rarity: "Very Rare", attunement: "Yes", effect: "This ring allows the wearer to cast Teleport once per day and grants the ability to know the distance and direction of a known location." },
+{ name: "Wand of the Winter’s Chill", rarity: "Rare", attunement: "Yes", effect: "A wand that allows the wielder to cast Cone of Cold once per day and grants resistance to cold damage." },
+{ name: "Cape of the Midnight Sky", rarity: "Legendary", attunement: "Yes", effect: "A cape that grants the wearer the ability to cast Darkvision and Telekinesis once per day, and grants immunity to necrotic damage." },
+{ name: "Girdle of the Steelheart", rarity: "Very Rare", attunement: "Yes", effect: "A girdle that increases Constitution by +2 and grants the wearer resistance to all physical damage (bludgeoning, piercing, and slashing)." },
+{ name: "Dagger of Quickstrike", rarity: "Rare", attunement: "Yes", effect: "A dagger that grants the ability to make an additional attack as a bonus action and deals an additional 1d6 sneak attack damage." },
+{ name: "Bracers of the Swift Fox", rarity: "Uncommon", attunement: "Yes", effect: "These bracers increase Dexterity by +2 and grant the ability to Dash as a bonus action once per short rest." },
+{ name: "Blade of Eternal Light", rarity: "Legendary", attunement: "Yes", effect: "A longsword that deals an additional 2d6 radiant damage and once per day can cast Sunburst." },
+{ name: "Cloak of the Silver Moon", rarity: "Rare", attunement: "Yes", effect: "A cloak that grants the wearer the ability to cast Moonbeam at will and grants resistance to radiant damage." },
+{ name: "Ring of the Mindbender", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the ability to cast Dominate Person once per day and grants advantage on Charisma (Persuasion) checks." },
+{ name: "Cloak of Time’s Embrace", rarity: "Legendary", attunement: "Yes", effect: "A cloak that grants the wearer the ability to cast Time Stop once per day and grants advantage on initiative rolls." },
+{ name: "Frostfang Dagger", rarity: "Rare", attunement: "Yes", effect: "A dagger that deals an additional 1d6 cold damage and grants the ability to cast Ice Knife once per day." },
+{ name: "Orb of the Eldritch Sea", rarity: "Very Rare", attunement: "Yes", effect: "An orb that grants the ability to cast Wall of Water once per day and grants the ability to breathe underwater." },
+{ name: "Helm of the Stormlord", rarity: "Legendary", attunement: "Yes", effect: "A helm that grants the wearer the ability to cast Control Weather once per day and grants immunity to lightning damage." },
+{ name: "Sword of the Sun’s Fury", rarity: "Very Rare", attunement: "Yes", effect: "A sword that deals an additional 1d6 radiant damage on a hit and once per day can cast Flame Strike." },
+{ name: "Amulet of the Voidwalker", rarity: "Rare", attunement: "Yes", effect: "An amulet that grants the wearer the ability to cast Misty Step at will and grants resistance to necrotic damage." },
+{ name: "Vampiric Cloak", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants the wearer the ability to regain 5 hit points when dealing necrotic damage and grants resistance to necrotic damage." },
+{ name: "Staff of the Arcane Tempest", rarity: "Legendary", attunement: "Yes", effect: "A staff that grants the ability to cast Chain Lightning once per day and increases spellcasting ability by +2." },
+{ name: "Ring of Fire’s Wrath", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the ability to cast Fireball once per day and grants resistance to fire damage." },
+{ name: "Boots of the Silverwind", rarity: "Rare", attunement: "Yes", effect: "Boots that allow the wearer to Dash as a bonus action and gain advantage on Acrobatics checks." },
+{ name: "Cloak of the Inferno", rarity: "Legendary", attunement: "Yes", effect: "A cloak that grants the ability to cast Firestorm once per day and grants immunity to fire damage." },
+{ name: "Sword of the Shadows", rarity: "Very Rare", attunement: "Yes", effect: "A sword that deals an additional 1d6 necrotic damage and allows the wielder to cast Darkness once per day." },
+{ name: "Ring of Temporal Mastery", rarity: "Legendary", attunement: "Yes", effect: "A ring that grants the wearer the ability to cast Time Stop once per day and grants advantage on initiative rolls." },
+{ name: "Bracers of the Swift Storm", rarity: "Rare", attunement: "Yes", effect: "Bracers that increase Dexterity by +2 and allow the wearer to cast Thunderwave once per day." },
+{ name: "Cloak of the Phantasmal Trickster", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants the wearer the ability to cast Greater Invisibility once per day and grants advantage on Stealth checks." },
+{ name: "Necklace of the Seven Seas", rarity: "Rare", attunement: "Yes", effect: "A necklace that grants the wearer the ability to cast Control Water and summon water elementals once per day." },
+{ name: "Girdle of the Eternal Warrior", rarity: "Legendary", attunement: "Yes", effect: "A girdle that increases Constitution by +2, grants resistance to all damage types for 1 minute once per long rest." },
+{ name: "Trident of the Deep", rarity: "Rare", attunement: "Yes", effect: "A trident that grants the ability to cast Call Lightning once per day and grants the wearer the ability to breathe underwater." },
+{ name: "Amulet of Infinite Knowledge", rarity: "Very Rare", attunement: "Yes", effect: "An amulet that grants the ability to cast Legend Lore once per day and increases Intelligence by +2." },
+{ name: "Scepter of the Eternal Flame", rarity: "Legendary", attunement: "Yes", effect: "A scepter that grants the ability to cast Fireball once per day and grants immunity to fire damage." },
+{ name: "Hammer of the Celestial Forge", rarity: "Very Rare", attunement: "Yes", effect: "A warhammer that deals an additional 2d6 radiant damage and once per day can cast Holy Weapon." },
+{ name: "Ring of Celestial Guidance", rarity: "Rare", attunement: "Yes", effect: "A ring that grants the wearer advantage on Wisdom saving throws and the ability to cast Aid once per day." },
+{ name: "Wand of the Weeping Moon", rarity: "Rare", attunement: "Yes", effect: "A wand that allows the wielder to cast Moonbeam once per day and grants resistance to radiant damage." },
+{ name: "Bracers of the Astral Knight", rarity: "Very Rare", attunement: "Yes", effect: "These bracers increase Strength by +2 and grant the ability to cast Shield once per day." },
+{ name: "Crown of the Everlasting Mind", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants advantage on Wisdom and Intelligence saving throws and the ability to cast Telepathic Bond once per day." },
+{ name: "Vampire’s Kiss Dagger", rarity: "Very Rare", attunement: "Yes", effect: "A dagger that deals an additional 1d6 necrotic damage and grants the wielder the ability to regain hit points equal to half the damage dealt." },
+{ name: "Belt of the Behemoth", rarity: "Legendary", attunement: "Yes", effect: "A belt that grants the wearer advantage on Strength checks and saves, and increases Strength by +4." },
+{ name: "Aegis of the Guardian", rarity: "Rare", attunement: "Yes", effect: "A shield that grants the wearer resistance to all damage types when they are protecting another creature." },
+{ name: "Dagger of the Starfallen", rarity: "Very Rare", attunement: "Yes", effect: "A dagger that deals an additional 1d6 radiant damage and allows the wielder to cast Starfall once per day." },
+{ name: "Boots of the Silent Steps", rarity: "Uncommon", attunement: "Yes", effect: "These boots grant advantage on Stealth checks and the wearer can move without making a sound." },
+{ name: "Ring of the Eternal Flame", rarity: "Legendary", attunement: "Yes", effect: "A ring that grants the ability to cast Fireball once per day and grants the wearer immunity to fire damage." },
+{ name: "Cloak of the Ancient One", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants the ability to cast Greater Invisibility and grants resistance to all damage types once per day." },
+{ name: "Whispers of the Dreamer", rarity: "Legendary", attunement: "Yes", effect: "A pair of earrings that grant the ability to cast Dream once per day and provide immunity to sleep effects." },
+{ name: "Bracelet of Time’s Flow", rarity: "Rare", attunement: "Yes", effect: "A bracelet that allows the wearer to cast Haste once per long rest and grants advantage on Dexterity saving throws." },
+{ name: "Giant’s Strength Potion", rarity: "Rare", attunement: "No", effect: "A potion that increases the drinker’s Strength score by 4 for 1 hour." },
+{ name: "Gloves of the Silent Assassin", rarity: "Uncommon", attunement: "Yes", effect: "Gloves that increase Dexterity by +2 and grant advantage on Stealth checks." },
+{ name: "Wand of the Silver Stars", rarity: "Rare", attunement: "Yes", effect: "A wand that allows the wielder to cast Fairy Fire and Guiding Bolt once per day." },
+{ name: "Amulet of the Phoenix’s Flame", rarity: "Very Rare", attunement: "Yes", effect: "An amulet that grants the wearer the ability to cast Flame Strike once per day and grants the ability to resurrect once per long rest." },
+{ name: "Soulstone Dagger", rarity: "Legendary", attunement: "Yes", effect: "A dagger that deals an additional 2d6 necrotic damage and can trap the soul of a creature it kills." },
+{ name: "Crown of the Dragon King", rarity: "Very Rare", attunement: "Yes", effect: "A crown that grants the wearer advantage on Charisma saving throws and allows the wearer to control dragons once per day." },
+{ name: "Tunic of the Tempest", rarity: "Rare", attunement: "Yes", effect: "A tunic that grants resistance to lightning damage and allows the wearer to cast Thunderstorm once per day." },
+{ name: "Shield of the Celestial Defender", rarity: "Legendary", attunement: "Yes", effect: "A shield that grants the wearer advantage on all saving throws and once per day can cast Shield of Faith on themselves or another." },
+{ name: "Mirror of the Lost King", rarity: "Rare", attunement: "Yes", effect: "A mirror that allows the wearer to cast Disguise Self at will and grants advantage on Charisma checks when interacting with nobility." },
+{ name: "Potion of Eternal Youth", rarity: "Legendary", attunement: "No", effect: "A potion that grants the drinker the effects of the Wish spell, rejuvenating them to a youthful state." },
+{ name: "Helm of the Wild Hunt", rarity: "Very Rare", attunement: "Yes", effect: "A helm that grants the wearer the ability to cast Hunter’s Mark at will and grants advantage on survival checks." },
+{ name: "Bracers of the Moonlit Knight", rarity: "Legendary", attunement: "Yes", effect: "Bracers that grant the wearer the ability to summon a spectral mount once per day and provide resistance to radiant damage." },
+{ name: "Wings of the Phoenix", rarity: "Very Rare", attunement: "Yes", effect: "A set of wings that grant the wearer the ability to fly and once per long rest, allow the wearer to cast Fireball." },
+{ name: "Dawnbringer's Blessing", rarity: "Legendary", attunement: "Yes", effect: "A mace that deals an additional 2d6 radiant damage and can cast Light at will. Once per day, it can cast Divine Word." },
+{ name: "Vortex Cloak", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that allows the wearer to cast Levitate at will and grants resistance to force damage." },
+{ name: "Wand of the Moonlit Path", rarity: "Rare", attunement: "Yes", effect: "A wand that grants the wielder the ability to cast Moonbeam at will and grants advantage on Wisdom saving throws." },
+{ name: "Mask of the Faceless", rarity: "Legendary", attunement: "Yes", effect: "A mask that allows the wearer to cast Disguise Self at will and grants the ability to become invisible once per day." },
+{ name: "Ring of Shadow’s Grasp", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the wearer the ability to cast Shadow Step once per day and grants resistance to necrotic damage." },
+{ name: "Dagger of the Wind Whisperer", rarity: "Rare", attunement: "Yes", effect: "A dagger that deals an additional 1d6 force damage and grants advantage on Stealth checks." },
+{ name: "Cloak of the Dragon’s Roar", rarity: "Legendary", attunement: "Yes", effect: "A cloak that grants the wearer the ability to cast Dragon’s Breath once per day and grants resistance to fire damage." },
+{ name: "Flameheart Gauntlets", rarity: "Very Rare", attunement: "Yes", effect: "Gauntlets that grant the ability to cast Fireball once per day and deal an additional 1d6 fire damage on unarmed strikes." },
+{ name: "Grimoire of the Forgotten One", rarity: "Legendary", attunement: "Yes", effect: "A tome that grants the ability to learn two additional spells of any level and once per day can cast Foresight." },
+{ name: "Eye of the Fallen Star", rarity: "Very Rare", attunement: "Yes", effect: "An orb that grants the ability to cast True Seeing once per day and grants the ability to read minds once per day." },
+{ name: "Bracers of the Eternal Storm", rarity: "Rare", attunement: "Yes", effect: "Bracers that allow the wearer to cast Thunderwave at will and grants advantage on Strength saving throws." },
+{ name: "Ring of the Infernal Pact", rarity: "Legendary", attunement: "Yes", effect: "A ring that allows the wearer to cast Hellish Rebuke at will and once per day can summon a devil to serve for 1 hour." },
+{ name: "Cloak of the Wild Hunt", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants the ability to cast Beast Shape once per day and grants advantage on animal handling checks." },
+{ name: "Soulfire Staff", rarity: "Legendary", attunement: "Yes", effect: "A staff that deals an additional 1d6 necrotic damage and once per day can cast Finger of Death." },
+{ name: "Scythe of the Harvest Moon", rarity: "Very Rare", attunement: "Yes", effect: "A scythe that deals an additional 1d6 necrotic damage and grants the ability to cast Harvest once per day." },
+{ name: "The Astral Compass", rarity: "Rare", attunement: "Yes", effect: "A compass that allows the wielder to cast Plane Shift once per day and grants the ability to navigate through any terrain." },
+{ name: "Crown of the Fallen King", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants the wearer the ability to command undead and once per day can cast Animate Dead at higher levels." },
+{ name: "Boots of the Skywarden", rarity: "Very Rare", attunement: "Yes", effect: "Boots that allow the wearer to cast Fly once per day and grants advantage on Acrobatics checks." },
+{ name: "Staff of the Wyrm", rarity: "Legendary", attunement: "Yes", effect: "A staff that grants the ability to cast Control Dragon once per day and allows the wielder to speak Draconic." },
+{ name: "The Midnight Hourglass", rarity: "Very Rare", attunement: "Yes", effect: "An hourglass that grants the ability to cast Time Stop once per day and grants advantage on initiative rolls." },
+{ name: "Ring of Souls' Embrace", rarity: "Rare", attunement: "Yes", effect: "A ring that grants the ability to cast Revivify once per day and allows the wearer to absorb a soul once per week." },
+{ name: "Wand of Frostbound Fury", rarity: "Very Rare", attunement: "Yes", effect: "A wand that allows the wielder to cast Cone of Cold once per day and grants resistance to cold damage." },
+{ name: "Blade of the Rift Walker", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 1d6 force damage and allows the wielder to cast Dimension Door once per day." },
+{ name: "Veil of the Forgotten", rarity: "Rare", attunement: "Yes", effect: "A veil that grants the wearer the ability to cast Blur at will and grants advantage on Stealth checks." },
+{ name: "Frostbitten Axe", rarity: "Very Rare", attunement: "Yes", effect: "An axe that deals an additional 1d6 cold damage and once per day can cast Ice Storm." },
+{ name: "Crown of the Eternal Sun", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants the ability to cast Sunburst once per day and grants the wearer resistance to radiant damage." },
+{ name: "Gauntlets of the Unyielding", rarity: "Rare", attunement: "Yes", effect: "Gauntlets that grant the wearer advantage on Strength (Athletics) checks and once per day allow the wearer to cast Hold Person." },
+{ name: "The Helm of the Shattered Mind", rarity: "Very Rare", attunement: "Yes", effect: "A helm that grants the ability to cast Psionic Blast once per day and grants advantage on Intelligence saving throws." },
+{ name: "The Eternal Tome", rarity: "Legendary", attunement: "Yes", effect: "A tome that grants the ability to learn two additional spells of any level and once per long rest can cast Wish." },
+{ name: "Boots of the Depths", rarity: "Rare", attunement: "Yes", effect: "Boots that allow the wearer to breathe underwater and cast Water Breathing at will." },
+{ name: "The Dreamweaver's Loom", rarity: "Legendary", attunement: "Yes", effect: "A loom that grants the ability to cast Dream once per day and allows the user to create illusionary garments of power." },
+{ name: "Hammer of Eternal Strikes", rarity: "Legendary", attunement: "Yes", effect: "A warhammer that deals an additional 1d6 thunder damage and grants the ability to cast Earthquake once per day." },
+{ name: "Ring of the True Seer", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the ability to see through illusions and once per day grants the wearer the ability to cast Foresight." },
+{ name: "The Heart of the Storm", rarity: "Rare", attunement: "Yes", effect: "A pendant that grants resistance to lightning damage and once per day allows the wearer to cast Lightning Bolt." },
+{ name: "The Obsidian Blade", rarity: "Very Rare", attunement: "Yes", effect: "A longsword that deals an additional 1d6 necrotic damage and grants the ability to cast Shadow Blade once per day." },
+{ name: "Bow of the Hunter's Spirit", rarity: "Rare", attunement: "Yes", effect: "A longbow that grants the ability to cast Hunter’s Mark at will and once per day can cast Conjure Animals." },
+{ name: "Amulet of the Undying", rarity: "Legendary", attunement: "Yes", effect: "An amulet that grants the ability to cast Revivify once per day and once per long rest can bring a dead creature back to life." },
+{ name: "Gloves of the Iron Hand", rarity: "Rare", attunement: "Yes", effect: "Gloves that increase Strength by +2 and allow the wearer to cast Inflict Wounds once per day." },
+{ name: "Tunic of the Phoenix", rarity: "Legendary", attunement: "Yes", effect: "A tunic that grants resistance to fire damage and once per day allows the wearer to cast Fireball." },
+{ name: "Bracers of the Arcane Assassin", rarity: "Very Rare", attunement: "Yes", effect: "Bracers that grant the wearer advantage on Stealth checks and the ability to cast Counterspell once per day." },
+{ name: "Shield of the Eternal Vigil", rarity: "Legendary", attunement: "Yes", effect: "A shield that grants the ability to cast Shield of Faith at will and provides immunity to radiant damage." },
+{ name: "Cape of the Grand Illusionist", rarity: "Very Rare", attunement: "Yes", effect: "A cape that grants the wearer the ability to cast Greater Invisibility and grants advantage on Charisma (Deception) checks." },
+{ name: "The Blade of Blood and Fire", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 2d6 fire and necrotic damage, and once per day allows the user to cast Hellfire Orb." },
+{ name: "Necklace of the Celestial Song", rarity: "Legendary", attunement: "Yes", effect: "A necklace that grants the ability to cast Power Word Heal once per day and once per long rest allows the wearer to cast Mass Healing Word." },
+{ name: "The Bound Soulstone", rarity: "Rare", attunement: "Yes", effect: "A stone that grants the wearer the ability to cast Soul Cage once per day and can absorb the soul of a fallen creature." },
+{ name: "Sword of the Crimson Dawn", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 2d6 radiant damage and grants the wielder the ability to cast Sunbeam once per day." },
+{ name: "Boots of the Whispering Winds", rarity: "Rare", attunement: "Yes", effect: "Boots that grant the wearer the ability to cast Misty Step once per day and advantage on Dexterity saving throws." },
+{ name: "Gauntlets of the Iron Fist", rarity: "Very Rare", attunement: "Yes", effect: "Gauntlets that increase Strength by +2 and allow the wearer to cast Earth Tremor at will." },
+{ name: "Ring of the Moonlit Sea", rarity: "Rare", attunement: "Yes", effect: "A ring that grants the wearer the ability to breathe underwater and once per day cast Control Water." },
+{ name: "Cloak of Eternal Night", rarity: "Legendary", attunement: "Yes", effect: "A cloak that grants the wearer advantage on Stealth checks and allows the user to cast Darkness at will." },
+{ name: "Staff of the Storm King", rarity: "Legendary", attunement: "Yes", effect: "A staff that grants the ability to cast Call Lightning at will and once per day can summon a storm elemental." },
+{ name: "Necklace of the Eternal Flame", rarity: "Very Rare", attunement: "Yes", effect: "A necklace that grants resistance to fire damage and the ability to cast Fireball once per day." },
+{ name: "Dagger of the Silent Kill", rarity: "Rare", attunement: "Yes", effect: "A dagger that grants the wearer advantage on Stealth checks and once per day can cast Silence." },
+{ name: "Chalice of Immortality", rarity: "Legendary", attunement: "Yes", effect: "A chalice that grants the ability to cast Regeneration once per day and once per long rest allows the user to cast Clone." },
+{ name: "Crown of the Undying Emperor", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants the wearer the ability to command undead and once per day can cast Dominate Monster." },
+{ name: "Amulet of the Deep Sea", rarity: "Very Rare", attunement: "Yes", effect: "An amulet that grants the ability to breathe underwater and cast Tsunami once per day." },
+{ name: "Blade of the Eternal Night", rarity: "Legendary", attunement: "Yes", effect: "A blade that deals an additional 1d8 necrotic damage and grants the ability to cast Vampiric Touch once per day." },
+{ name: "Helm of the Stoneheart", rarity: "Rare", attunement: "Yes", effect: "A helm that grants resistance to bludgeoning damage and once per day allows the wearer to cast Stoneskin." },
+{ name: "Tunic of the Forest’s Embrace", rarity: "Very Rare", attunement: "Yes", effect: "A tunic that grants the wearer advantage on Dexterity (Stealth) checks and allows them to cast Barkskin at will." },
+{ name: "Ring of the Phoenix Rebirth", rarity: "Legendary", attunement: "Yes", effect: "A ring that grants the wearer the ability to cast Revivify once per day and grants immunity to fire damage." },
+{ name: "Wand of the Arcane Master", rarity: "Very Rare", attunement: "Yes", effect: "A wand that grants the ability to cast Greater Invisibility once per day and grants a +1 bonus to all spells cast." },
+{ name: "Gloves of the Stormlord", rarity: "Legendary", attunement: "Yes", effect: "Gloves that grant the ability to cast Chain Lightning once per day and deal an additional 1d6 lightning damage on melee hits." },
+{ name: "Cape of the Celestial Traveler", rarity: "Very Rare", attunement: "Yes", effect: "A cape that grants the ability to cast Plane Shift once per day and advantage on Charisma (Persuasion) checks." },
+{ name: "The Eternal Flask", rarity: "Rare", attunement: "Yes", effect: "A flask that never runs out of liquid and can hold any liquid, granting the ability to store potions for later use." },
+{ name: "Shield of the Great Defender", rarity: "Legendary", attunement: "Yes", effect: "A shield that grants the ability to cast Shield once per day and provides advantage on all saving throws against spells." },
+{ name: "Amulet of the Celestial Protector", rarity: "Very Rare", attunement: "Yes", effect: "An amulet that grants the wearer the ability to cast Sanctuary at will and grants resistance to radiant damage." },
+{ name: "Lute of the Bardic Sage", rarity: "Rare", attunement: "Yes", effect: "A lute that grants the ability to cast Charm Person once per day and once per long rest can cast Mass Suggestion." },
+{ name: "Rope of the Binding Serpent", rarity: "Very Rare", attunement: "Yes", effect: "A rope that can bind and entangle targets, granting advantage on grapple checks and the ability to cast Hold Monster once per day." },
+{ name: "The Gauntlet of the Titan", rarity: "Legendary", attunement: "Yes", effect: "A gauntlet that grants the wearer +2 Strength and the ability to cast Earthquake once per day." },
+{ name: "Spear of the Astral Wanderer", rarity: "Very Rare", attunement: "Yes", effect: "A spear that deals an additional 1d6 force damage and once per day can cast Teleport." },
+{ name: "Ring of the Stormcaller", rarity: "Rare", attunement: "Yes", effect: "A ring that grants the wearer resistance to lightning damage and allows them to cast Thunderstrike once per day." },
+{ name: "Tome of the Arcane Sorcery", rarity: "Legendary", attunement: "Yes", effect: "A tome that grants the ability to learn two additional spells of any level and once per long rest can cast Time Stop." },
+{ name: "Sword of the Lionheart", rarity: "Very Rare", attunement: "Yes", effect: "A sword that deals an additional 2d6 radiant damage and grants advantage on Charisma (Intimidation) checks." },
+{ name: "Cloak of the Unseen", rarity: "Rare", attunement: "Yes", effect: "A cloak that grants the wearer advantage on Stealth checks and once per day can cast Greater Invisibility." },
+{ name: "Trident of the Sea King", rarity: "Legendary", attunement: "Yes", effect: "A trident that deals an additional 1d8 cold damage and allows the wearer to cast Water Breathing at will." },
+{ name: "Bracers of the Unstoppable", rarity: "Rare", attunement: "Yes", effect: "Bracers that grant resistance to bludgeoning, piercing, and slashing damage and the ability to cast Shield once per day." },
+{ name: "Staff of the Inferno", rarity: "Very Rare", attunement: "Yes", effect: "A staff that deals an additional 1d8 fire damage and once per day allows the user to cast Fire Storm." },
+{ name: "Crown of the Last King", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants the wearer the ability to cast Command at will and grants resistance to necrotic damage." },
+{ name: "Raven’s Wing Cloak", rarity: "Rare", attunement: "Yes", effect: "A cloak that grants advantage on Dexterity saving throws and the ability to cast Feather Fall once per day." },
+{ name: "Bow of the Archmage", rarity: "Legendary", attunement: "Yes", effect: "A longbow that grants the ability to cast Arcane Blast once per day and deals an additional 1d6 force damage." },
+{ name: "Helm of the Warlord", rarity: "Very Rare", attunement: "Yes", effect: "A helm that grants the wearer advantage on Charisma (Intimidation) checks and once per day can cast Rallying Cry." },
+{ name: "Ring of the Eternal Flame", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the wearer the ability to cast Fireball once per day and immunity to fire damage." },
+{ name: "Boots of the Sky King", rarity: "Legendary", attunement: "Yes", effect: "Boots that grant the ability to fly once per day and increase the wearer’s speed by 30 feet." },
+{ name: "Shield of the Phoenix", rarity: "Legendary", attunement: "Yes", effect: "A shield that grants resistance to fire damage and once per day can cast Fire Shield." },
+{ name: "Amulet of the Wilds", rarity: "Rare", attunement: "Yes", effect: "An amulet that grants the wearer the ability to cast Barkskin at will and once per day can summon an elemental spirit." },
+{ name: "The Wyrmcaller’s Horn", rarity: "Very Rare", attunement: "Yes", effect: "A horn that grants the wearer the ability to communicate with dragons and once per day can summon a dragon to fight for them." },
+{ name: "Aegis of the Iron Guard", rarity: "Legendary", attunement: "Yes", effect: "A shield that grants the wearer immunity to poison and once per day can cast Mass Cure Wounds." },
+{ name: "Tome of the Forgotten Sorcery", rarity: "Very Rare", attunement: "Yes", effect: "A tome that grants the ability to learn two additional spells of any level and once per long rest can cast Meteor Swarm." },
+{ name: "Ethereal Blade", rarity: "Legendary", attunement: "Yes", effect: "A blade that deals an additional 1d8 force damage and allows the wielder to cast Plane Shift once per day." },
+{ name: "Boots of the Swift Tempest", rarity: "Rare", attunement: "Yes", effect: "Boots that grant the wearer a +2 bonus to Dexterity saving throws and increase movement speed by 10 feet." },
+{ name: "Ring of Shadows", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the ability to cast Shadow Step once per day and grants resistance to necrotic damage." },
+{ name: "The Bane of Dragons", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 2d6 damage against dragons and grants the ability to cast Dragon Slayer once per day." },
+{ name: "Shroud of the Moonlit Night", rarity: "Rare", attunement: "Yes", effect: "A cloak that grants advantage on Stealth checks during night and the ability to cast Moonbeam once per day." },
+{ name: "Blade of the Frost King", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 2d6 cold damage and grants the ability to cast Ice Wall once per day." },
+{ name: "Ring of the Shadow's Embrace", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the ability to cast Shadow Step once per day and grants resistance to necrotic damage." },
+{ name: "Boots of the Windwalker", rarity: "Rare", attunement: "Yes", effect: "Boots that grant the wearer the ability to cast Feather Fall at will and increase movement speed by 10 feet." },
+{ name: "Amulet of the Moon", rarity: "Rare", attunement: "Yes", effect: "An amulet that grants the ability to cast Moonbeam once per day and increases Wisdom by +2." },
+{ name: "Girdle of the Great Beast", rarity: "Very Rare", attunement: "Yes", effect: "A girdle that grants the wearer advantage on Strength checks and allows the user to cast Enlarge/Reduce at will." },
+{ name: "Hammer of the Mountain King", rarity: "Legendary", attunement: "Yes", effect: "A warhammer that deals an additional 2d6 bludgeoning damage and grants the ability to cast Earthquake once per day." },
+{ name: "Cloak of the Eternal Traveler", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants resistance to fire damage and the ability to cast Teleport once per day." },
+{ name: "Ring of the Firelord", rarity: "Legendary", attunement: "Yes", effect: "A ring that grants the wearer resistance to fire damage and once per day can cast Fire Storm." },
+{ name: "Vampiric Dagger", rarity: "Rare", attunement: "Yes", effect: "A dagger that deals an additional 1d6 necrotic damage and heals the user for half the damage dealt." },
+{ name: "Boots of the Silent Step", rarity: "Rare", attunement: "Yes", effect: "Boots that grant the wearer advantage on Stealth checks and make no sound while walking." },
+{ name: "Shield of the Eternal Guardian", rarity: "Very Rare", attunement: "Yes", effect: "A shield that grants +2 to AC and once per day can cast Shield of Faith at will." },
+{ name: "Cloak of the Phoenix", rarity: "Legendary", attunement: "Yes", effect: "A cloak that grants resistance to fire damage and once per long rest can cast Reincarnate." },
+{ name: "Wand of the Elemental Fury", rarity: "Very Rare", attunement: "Yes", effect: "A wand that grants the ability to cast Elemental Bane at will and deals an additional 1d6 elemental damage based on the target's weakness." },
+{ name: "Helm of the Iron Tyrant", rarity: "Rare", attunement: "Yes", effect: "A helm that grants the wearer advantage on Strength (Athletics) checks and once per day allows the user to cast Mass Enlarge." },
+{ name: "Staff of the Worldtree", rarity: "Legendary", attunement: "Yes", effect: "A staff that grants the wearer the ability to cast Heal once per day and increases Wisdom by +2." },
+{ name: "Boots of the Fleetfoot", rarity: "Rare", attunement: "Yes", effect: "Boots that increase the wearer's speed by 20 feet and grant advantage on Dexterity saving throws." },
+{ name: "Gauntlets of the Titan's Grip", rarity: "Very Rare", attunement: "Yes", effect: "Gauntlets that grant the wearer the ability to deal an additional 1d6 bludgeoning damage and increase Strength by +2." },
+{ name: "Ring of Arcane Rejuvenation", rarity: "Rare", attunement: "Yes", effect: "A ring that allows the wearer to regain 1 expended spell slot of 3rd level or lower once per long rest." },
+{ name: "Bow of the Huntress", rarity: "Very Rare", attunement: "Yes", effect: "A longbow that grants the wearer +2 to attack rolls and once per day can cast Hunter's Mark." },
+{ name: "Dagger of the Viper", rarity: "Rare", attunement: "Yes", effect: "A dagger that deals an additional 1d6 poison damage and grants advantage on attack rolls against poisoned creatures." },
+{ name: "Helm of the Stormcaller", rarity: "Legendary", attunement: "Yes", effect: "A helm that grants the wearer the ability to cast Storm Sphere once per day and resistance to lightning damage." },
+{ name: "Amulet of the Wild Hunt", rarity: "Rare", attunement: "Yes", effect: "An amulet that grants the ability to cast Animal Friendship at will and once per day can cast Conjure Animals." },
+{ name: "Sword of the Blood Moon", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 2d6 necrotic damage and grants the user the ability to cast Blood Curse once per day." },
+{ name: "Cloak of the Hidden Path", rarity: "Very Rare", attunement: "Yes", effect: "A cloak that grants advantage on Stealth checks and once per day can cast Invisibility." },
+{ name: "Ring of Celestial Protection", rarity: "Very Rare", attunement: "Yes", effect: "A ring that grants the wearer resistance to radiant damage and once per day can cast Mass Cure Wounds." },
+{ name: "Spear of the True Warrior", rarity: "Legendary", attunement: "Yes", effect: "A spear that grants the wearer +2 to attack rolls and once per long rest can cast Divine Smite." },
+{ name: "Shield of the Dwarven Defender", rarity: "Rare", attunement: "Yes", effect: "A shield that grants resistance to bludgeoning, piercing, and slashing damage from non-magical attacks." },
+{ name: "Rod of the Arcane Scholar", rarity: "Very Rare", attunement: "Yes", effect: "A rod that grants the ability to cast Detect Magic at will and grants a +1 bonus to all Intelligence checks." },
+{ name: "Amulet of the Firefury", rarity: "Rare", attunement: "Yes", effect: "An amulet that grants the wearer the ability to cast Firebolt at will and once per day can cast Fireball." },
+{ name: "Crown of the Eternal King", rarity: "Legendary", attunement: "Yes", effect: "A crown that grants the wearer the ability to cast Command at will and once per day can cast Dominate Monster." },
+{ name: "Glaive of the Immortal Warrior", rarity: "Legendary", attunement: "Yes", effect: "A glaive that grants the wearer +2 to attack rolls and once per day can cast Power Word Kill." },
+{ name: "Necklace of the Stormheart", rarity: "Very Rare", attunement: "Yes", effect: "A necklace that grants resistance to lightning damage and once per day can cast Call Lightning." },
+{ name: "Ring of the Farseer", rarity: "Rare", attunement: "Yes", effect: "A ring that grants the wearer the ability to cast Clairvoyance once per day and once per long rest can cast Telepathic Bond." },
+{ name: "Wand of the Arcane Torrent", rarity: "Legendary", attunement: "Yes", effect: "A wand that grants the ability to cast Chain Lightning once per day and grants +2 to Intelligence saving throws." },
+{ name: "Gloves of the Unseen Hand", rarity: "Very Rare", attunement: "Yes", effect: "Gloves that grant the wearer the ability to cast Mage Hand at will and once per day can cast Telekinesis." },
+{ name: "Boots of the Earthshaker", rarity: "Rare", attunement: "Yes", effect: "Boots that grant the ability to cast Earth Tremor once per day and increase the wearer’s movement speed by 10 feet." },
+{ name: "Sword of the Radiant Dawn", rarity: "Legendary", attunement: "Yes", effect: "A sword that deals an additional 2d6 radiant damage and once per day can cast Sunbeam." },
+{ name: "Helm of the Celestial Guardian", rarity: "Legendary", attunement: "Yes", effect: "A helm that grants resistance to radiant damage and the ability to cast Mass Heal once per day." },
+{ name: "Tome of the Eternal Scholar", rarity: "Very Rare", attunement: "Yes", effect: "A tome that grants the ability to learn two additional spells of any level and once per long rest can cast True Polymorph." },
+{ name: "Axe of the Blood Fury", rarity: "Very Rare", attunement: "Yes", effect: "An axe that deals an additional 1d6 necrotic damage and once per day grants the user temporary hit points equal to the damage dealt." },
+{ name: "Shield of the Celestial Light", rarity: "Legendary", attunement: "Yes", effect: "A shield that grants the wearer resistance to radiant and necrotic damage and once per day can cast Light of the Dawn." },
+{ name: "Spear of the Storm Lord", rarity: "Legendary", attunement: "Yes", effect: "A spear that deals an additional 1d6 lightning damage and grants the ability to cast Thunderclap at will." },
+{ name: "Cape of the Infinite Horizon", rarity: "Very Rare", attunement: "Yes", effect: "A cape that grants the wearer the ability to cast Plane Shift once per day and once per long rest can cast Teleport." },
+{ name: "Ring of the Infernal Pact", rarity: "Legendary", attunement: "Yes", effect: "A ring that grants the wearer resistance to fire damage and once per long rest can cast Hellish Rebuke." },
+{ name: "Rod of the Eternal Flame", rarity: "Very Rare", attunement: "Yes", effect: "A rod that grants the wearer the ability to cast Fireball once per day and increases Charisma by +2." }
+    
+];
+
+        function getRandomMagicItem() {
+            const index = Math.floor(Math.random() * magicItems.length);
+            const item = magicItems[index];
+            const resultDiv = document.getElementById("result");
+            resultDiv.innerHTML = `
+                <h3>${item.name}</h3>
+                <p><strong>Rarity:</strong> ${item.rarity}</p>
+                <p><strong>Requires Attunement:</strong> ${item.attunement}</p>
+                <p><strong>Effect:</strong> ${item.effect}</p>
+            `;
+            resultDiv.style.display = "block";
+        }
+    </script>
+</head>
+<body>
+    <h1>Magic Item Creator</h1>
+    <div class="rules">
+        <h2>Rules</h2>
+        <p><strong>Time:</strong> 10 days per item rarity level (e.g., Common: 10 days, Rare: 30 days).</p>
+        <p><strong>Gold Cost:</strong> 500 GP per rarity level.</p>
+    </div>
+    <div class="button-container">
+        <button onclick="getRandomMagicItem()">Create Magic Item</button>
+    </div>
+    <div id="result" class="result">
+        <!-- Magic item result will appear here -->
+    </div>
+</body>
+</html>
