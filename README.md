@@ -1,4 +1,4 @@
-# Random Magic Item Generator
+<p align="center"><img src="https://i.imgur.com/eI9EIFJ.png"></p>
 
 This repository contains a simple HTML page that generates a random magic item, weapon, or armor from a predefined list when you click a button. The project is built using **HTML**, **CSS**, and **JavaScript**. It includes a collection of **290 magic items** created for use with the 2014 rules for 5e.
 
